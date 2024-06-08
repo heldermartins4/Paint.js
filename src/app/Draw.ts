@@ -1,35 +1,34 @@
-// Draw.ts
-import { BrowserWindow } from 'electron';
 import Canvas from './Canvas';
 
-// interface Line {
-//     x1: number;
-//     y1: number;
-//     x2: number;
-//     y2: number;
-//     color: string;
-//     thickness: number;
-// }
+interface Line {
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+    color: string;
+    thickness: number;
+}
 
-// interface IDraw {
-//     // getters and setters
-//     x: number;
-//     y: number;
-//     color: string;
-//     thickness: number;
-//     lines: Line[];
-//     isPainting: boolean;
-//     // methods
-//     clear(): void;
-//     drawLine(
-//         x1: number, 
-//         y1: number, 
-//         x2: number, 
-//         y2: number, 
-//         color: string, 
-//         thickness: number
-//     ): void;
-// }
+interface IDraw {
+    // getters and setters
+    x: number;
+    y: number;
+    color: string;
+    thickness: number;
+    lines: Line[];
+    isPainting: boolean;
+    // methods
+    clear(): void;
+    drawLine(
+        x1: number, 
+        y1: number, 
+        x2: number, 
+        y2: number, 
+        color: string, 
+        thickness: number
+    ): void;
+    draw(x: number, y: number): void;
+}
 
 class Draw extends Canvas {
 
@@ -39,15 +38,15 @@ class Draw extends Canvas {
 
     private _color: string;
     private _thickness: number;
-    // private _lines: Line[];
+    private _lines: Line[];
 
-    constructor(window: BrowserWindow) {
+    constructor(canvas: HTMLCanvasElement) {
 
-        super(window, 'canvas');
+        super(canvas);
         this._isPainting = false;
         this._x = 0;
         this._y = 0;
-        // this._lines = [];
+        this._lines = [];
         this._color = '#000000';
         this._thickness = 1;
     }
@@ -84,13 +83,13 @@ class Draw extends Canvas {
         this._thickness = thickness;
     }
 
-    // public get lines(): Line[] {
-    //     return this._lines;
-    // }
+    public get lines(): Line[] {
+        return this._lines;
+    }
 
-    // public set lines(lines: Line[]) {
-    //     this._lines = lines;
-    // }
+    public set lines(lines: Line[]) {
+        this._lines = lines;
+    }
 
     public get isPainting(): boolean {
         return this._isPainting;
@@ -100,22 +99,43 @@ class Draw extends Canvas {
         this._isPainting = isPainting;
     }
 
-    // public clear() {
+    public clear() {
 
-    //     this.ctx.clearRect(0, 0, this.width, this.height);
-    // }
+        this.ctx.clearRect(0, 0, this.width, this.height);
+    }
 
-    // public drawLine(x1: number, y1: number, x2: number, y2: number, color: string, thickness: number) {
+    public drawLine(x1: number, y1: number, x2: number, y2: number, color: string, thickness: number) {
 
-    //     this.ctx.beginPath();
+        this.ctx.beginPath();
 
-    //     this.ctx.strokeStyle = color;
-    //     this.ctx.lineWidth = thickness;
-    //     this.ctx.moveTo(x1, y1);
-    //     this.ctx.lineTo(x2, y2);
-    //     this.ctx.stroke();
-    //     this.ctx.closePath();
-    // }
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = thickness;
+        this.ctx.moveTo(x1, y1);
+        this.ctx.lineTo(x2, y2);
+        this.ctx.stroke();
+        this.ctx.closePath();
+    }
+
+    public paint(x: number, y: number) {
+
+        if (!this.isPainting) return;
+
+        this.drawLine(this.x, this.y, x, y, this.color, this.thickness);
+        this.x = x;
+        this.y = y;
+    }
+
+    public startPainting(x: number, y: number) {
+
+        this.isPainting = true;
+        this.x = x;
+        this.y = y;
+    }
+
+    public stopPainting() {
+
+        this.isPainting = false;
+    }
 }
 
 export default Draw;

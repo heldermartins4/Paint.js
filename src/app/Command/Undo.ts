@@ -1,4 +1,4 @@
-import ICommand from "../../interfaces/ICommand";
+import ICommand from "../../presenters/ICommand";
 
 import Canvas from '../Canvas';
 

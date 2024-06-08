@@ -1,4 +1,5 @@
-import { BrowserWindow, BrowserWindowConstructorOptions } from "electron";
+import { BrowserWindow } from "electron";
+import { MainApplication } from "./MainApplication.group";
 
 interface IWindow {
 
@@ -10,7 +11,7 @@ interface IWindow {
     backgroundImage: string;
 
     // Methods
-    create(props:BrowserWindowConstructorOptions): BrowserWindow;
+    create(props: MainApplication.customCreateWindowProps): BrowserWindow;
     destroy(): void;
     resize(width: number, height: number): void;
     show(): void;

@@ -1,6 +1,7 @@
 import { BrowserWindow, BrowserWindowConstructorOptions } from 'electron';
-import IWindow from '../interfaces/IWindow';
+import IWindow from '../presenters/window.interface';
 import path from 'path';
+import { MainApplication } from '../presenters/MainApplication.group';
 
 abstract class ElectronWindow implements IWindow {
 
@@ -8,11 +9,11 @@ abstract class ElectronWindow implements IWindow {
     private _title: string;
     private _width: number;
     private _height: number;
-    
+
     private _backgroundColor: string = '#FFFFFF';
     private _backgroundImage: string | undefined;
 
-    constructor(title: string, width?: number, height?:number) {
+    constructor(title: string, width?: number, height?: number) {
         this._title = title;
         if (width === undefined) {
             width = 800;
@@ -79,20 +80,18 @@ abstract class ElectronWindow implements IWindow {
         this.mainWindow = value;
     }
 
-    create(props?: BrowserWindowConstructorOptions): BrowserWindow {
+    create({ loadUrl, ...props }: MainApplication.customCreateWindowProps): BrowserWindow {
+
         this.mainWindow = new BrowserWindow({
             width: this.width,
             height: this.height,
-            webPreferences: {
-                preload: path.join(__dirname, '../../public/preload.js'),
-                contextIsolation: true,
-                nodeIntegration: true
-            },
-            icon: props?.icon || path.join(__dirname, '../../public/icon.png')
+            ...props,
         });
 
         this.mainWindow.setTitle(this.title);
-        this.mainWindow.loadFile(path.join(__dirname, '../../public/index.html'));
+        // this.mainWindow.loadFile(path.join(__dirname, '../../public/index.html'));
+        
+        this.mainWindow.loadURL('http://localhost:3000');
 
         this.mainWindow.on('closed', () => {
             this.mainWindow = undefined;

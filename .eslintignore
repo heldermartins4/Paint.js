@@ -1,6 +1,6 @@
+*/.js
 node_modules
-yarn.lock
 dist
-packages
+webpack/*.js
 .webpack
 out

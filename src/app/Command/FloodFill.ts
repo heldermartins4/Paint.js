@@ -1,4 +1,4 @@
-import ICommand from "../../interfaces/ICommand";
+import ICommand from "../../presenters/ICommand";
 
 class FloodFill implements ICommand {
     private floodFill: (x: number, y: number, target_col: any, replace_col: any) => void;

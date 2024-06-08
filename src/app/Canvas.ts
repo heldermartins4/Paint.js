@@ -1,53 +1,53 @@
-import { BrowserWindow } from "electron";
-import { ICanvas } from "../interfaces/ICanvas";
-import DOMController from "./DOMController";
+import { ICanvas } from "../presenters/ICanvas";
 
-class Canvas {
+class Canvas implements ICanvas {
     
-    private domParser: DOMController | null = null;
-    // private _canvas: HTMLCanvasElement | null;
     private _width: number = 800;
     private _height: number = 600;
+    private _canvas: HTMLCanvasElement;
+    private _ctx: CanvasRenderingContext2D ;
 
-    // public ctx: CanvasRenderingContext2D;
+    constructor(canvas:HTMLCanvasElement) {
 
-    constructor(window: BrowserWindow, canvasId: string) {
-
-        this.domParser = new DOMController(window);
-        this.domParser.getProperties((() => {
-            if (!document) return;
-            const context = (document.getElementById(canvasId)! as HTMLCanvasElement).getContext('2d')!;
-
-            return context;
-        })());
+        this._canvas = canvas;
+        this._ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     }
 
-    // public get canvas(): HTMLCanvasElement {
-    //     if (this._canvas === null) {
-    //         this._canvas = this.document.createElement('canvas');
-    //     }
-    //     return this._canvas;
-    // }
+    public get canvas(): HTMLCanvasElement {
+        if (this._canvas === null) {
+            // this._canvas = this.document.createElement('canvas');
+            throw new Error("Canvas not can be accessed (null or undefined)");
+        }
+        return this._canvas;
+    }
 
-    // public set canvas(canvas: HTMLCanvasElement) {
-    //     this._canvas = canvas;
-    // }
+    public set canvas(canvas: HTMLCanvasElement) {
+        this._canvas = canvas;
+    }
 
-    // public get width(): number {
-    //     return this._width;
-    // }
+    public get ctx():CanvasRenderingContext2D {
+        return this._ctx;
+    }
 
-    // public set width(width: number) {
-    //     this._width = width;
-    // }
+    public set ctx(ctx:CanvasRenderingContext2D) {
+        this._ctx = ctx;
+    }
 
-    // public get height(): number {
-    //     return this._height;
-    // }
+    public get width(): number {
+        return this._width;
+    }
 
-    // public set height(height: number) {
-    //     this._height = height;
-    // }
+    public set width(width: number) {
+        this._width = width;
+    }
+
+    public get height(): number {
+        return this._height;
+    }
+
+    public set height(height: number) {
+        this._height = height;
+    }
 }
 
 export default Canvas;
