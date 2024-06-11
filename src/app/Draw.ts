@@ -99,17 +99,14 @@ class Draw extends Canvas {
         this._isPainting = isPainting;
     }
 
-    public clear() {
-
-        this.ctx.clearRect(0, 0, this.width, this.height);
-    }
-
     public drawLine(x1: number, y1: number, x2: number, y2: number, color: string, thickness: number) {
 
         this.ctx.beginPath();
 
         this.ctx.strokeStyle = color;
         this.ctx.lineWidth = thickness;
+        // this.ctx.imageSmoothingEnabled = false;
+        this.ctx.lineCap = 'round';
         this.ctx.moveTo(x1, y1);
         this.ctx.lineTo(x2, y2);
         this.ctx.stroke();
@@ -135,6 +132,19 @@ class Draw extends Canvas {
     public stopPainting() {
 
         this.isPainting = false;
+    }
+
+    public clear() {
+        
+        this.ctx.clearRect(0, 0, this.width, this.height);
+    }
+
+    public setColor(color: string) {
+        this.color = color;
+    }
+
+    public setThickness(thickness: number) {
+        this.thickness = thickness;
     }
 }
 

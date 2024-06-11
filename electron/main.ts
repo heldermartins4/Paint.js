@@ -8,7 +8,7 @@ if (!MAIN_WINDOW_WEBPACK_ENTRY || !MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY) {
 }
 
 new Application('Paint App', {
-  icon: '../public/icon.png',
+  icon: '../../public/icon.png',
   loadUrl: MAIN_WINDOW_WEBPACK_ENTRY,
   webPreferences: {
     preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,

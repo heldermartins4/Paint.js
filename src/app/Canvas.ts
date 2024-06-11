@@ -1,6 +1,6 @@
-import { ICanvas } from "../presenters/ICanvas";
+import { Paint } from "../presenters/Paint.group";
 
-class Canvas implements ICanvas {
+class Canvas implements Paint.Canvas {
     
     private _width: number = 800;
     private _height: number = 600;
@@ -10,6 +10,8 @@ class Canvas implements ICanvas {
     constructor(canvas:HTMLCanvasElement) {
 
         this._canvas = canvas;
+        this._canvas.width = this._width;
+        this._canvas.height = this._height;
         this._ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     }
 
