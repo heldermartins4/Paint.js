@@ -15,7 +15,7 @@ interface IDraw {
     y: number;
     color: string;
     thickness: number;
-    lines: Line[];
+    lines: Line[][];
     isPainting: boolean;
     // methods
     clear(): void;
@@ -27,10 +27,16 @@ interface IDraw {
         color: string, 
         thickness: number
     ): void;
-    draw(x: number, y: number): void;
+    paint(x: number, y: number): void;
+    setColor(color: string): void;
+    setThickness(thickness: number): void;
+    startPainting(x: number, y: number): void;
+    stopPainting(): void;
+    // undo(): void;
+    // redo(): void;
 }
 
-class Draw extends Canvas {
+class Draw extends Canvas implements IDraw {
 
     private _isPainting: boolean;
     private _x: number;
@@ -38,17 +44,23 @@ class Draw extends Canvas {
 
     private _color: string;
     private _thickness: number;
-    private _lines: Line[];
+
+    public _lines: Line[][];
+    public currentLines: Line[];
+    public undoStack: Line[][];
+    public redoStack: Line[][];
 
     constructor(canvas: HTMLCanvasElement) {
-
         super(canvas);
         this._isPainting = false;
         this._x = 0;
         this._y = 0;
         this._lines = [];
+        this.currentLines = [];
         this._color = '#000000';
         this._thickness = 1;
+        this.undoStack = [];
+        this.redoStack = [];
     }
 
     public get x(): number {
@@ -83,11 +95,11 @@ class Draw extends Canvas {
         this._thickness = thickness;
     }
 
-    public get lines(): Line[] {
+    public get lines(): Line[][] {
         return this._lines;
     }
 
-    public set lines(lines: Line[]) {
+    public set lines(lines: Line[][]) {
         this._lines = lines;
     }
 
@@ -100,12 +112,9 @@ class Draw extends Canvas {
     }
 
     public drawLine(x1: number, y1: number, x2: number, y2: number, color: string, thickness: number) {
-
         this.ctx.beginPath();
-
         this.ctx.strokeStyle = color;
         this.ctx.lineWidth = thickness;
-        // this.ctx.imageSmoothingEnabled = false;
         this.ctx.lineCap = 'round';
         this.ctx.moveTo(x1, y1);
         this.ctx.lineTo(x2, y2);
@@ -114,28 +123,42 @@ class Draw extends Canvas {
     }
 
     public paint(x: number, y: number) {
-
         if (!this.isPainting) return;
 
         this.drawLine(this.x, this.y, x, y, this.color, this.thickness);
+        
+        // Adiciona a linha atual ao conjunto de linhas da sessão atual
+        this.currentLines.push({
+            x1: this.x,
+            y1: this.y,
+            x2: x,
+            y2: y,
+            color: this.color,
+            thickness: this.thickness
+        });
+
         this.x = x;
         this.y = y;
     }
 
     public startPainting(x: number, y: number) {
-
-        this.isPainting = true;
+        this.redoStack = [];  // Limpa a pilha de redo ao iniciar uma nova pintura
+        this.currentLines = []; // Inicia um novo conjunto de linhas para a sessão atual
+        this._isPainting = true;
         this.x = x;
         this.y = y;
     }
 
     public stopPainting() {
-
-        this.isPainting = false;
+        if (this.isPainting) {
+            this._lines.push(this.currentLines);  // Adiciona o conjunto de linhas da sessão atual ao array de linhas
+            this.undoStack.push(this.currentLines); // Adiciona o conjunto de linhas da sessão atual à pilha de undo
+            this.currentLines = []; // Reseta o array da sessão atual
+        }
+        this._isPainting = false;
     }
 
     public clear() {
-        
         this.ctx.clearRect(0, 0, this.width, this.height);
     }
 
@@ -146,6 +169,38 @@ class Draw extends Canvas {
     public setThickness(thickness: number) {
         this.thickness = thickness;
     }
+
+    // public undo() {
+    //     if (this.undoStack.length > 0) {
+    //         const lines = this.undoStack.pop();
+    //         if (lines) {
+    //             this.redoStack.push(lines);
+    //             this._lines = this._lines.filter(l => l !== lines);
+    //             this.clear();
+    //             this._lines.forEach(lines => {
+    //                 lines.forEach(line => {
+    //                     this.drawLine(line.x1, line.y1, line.x2, line.y2, line.color, line.thickness);
+    //                 });
+    //             });
+    //         }
+    //     }
+    // }
+
+    // public redo() {
+    //     if (this.redoStack.length > 0) {
+    //         const lines = this.redoStack.pop();
+    //         if (lines) {
+    //             this.undoStack.push(lines);
+    //             this._lines.push(lines);
+    //             this.clear();
+    //             this._lines.forEach(lines => {
+    //                 lines.forEach(line => {
+    //                     this.drawLine(line.x1, line.y1, line.x2, line.y2, line.color, line.thickness);
+    //                 });
+    //             });
+    //         }
+    //     }
+    // }
 }
 
 export default Draw;

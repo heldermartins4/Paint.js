@@ -21,7 +21,7 @@ export const ToolbarStyled = styled.div`
     max-width: 800px;
 `;
 
-export const InputColor = styled.input<{ props?: any }>`
+export const InputColor = styled.input<{ color?: string }>`
     width: 30px;
     height: 30px;
     border: none;
@@ -49,4 +49,9 @@ export const InputColor = styled.input<{ props?: any }>`
         border: none;
         border-radius: 50%;
     };
+`;
+
+export const StackControlStyled = styled.div`
+    display: flex;
+    gap: 3px;
 `;

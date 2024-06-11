@@ -3,6 +3,8 @@ import ElectronMenu from './ElectronMenu';
 import MenuItemsBuilder from './MenuBuilder';
 import { MainApplication } from '../presenters/MainApplication.group';
 
+import path from 'path';
+
 class Application {
   
   private _app: App;
@@ -26,12 +28,11 @@ class Application {
 
   private createWindow(title: string, {webPreferences, loadUrl, ...props}: MainApplication.customCreateWindowProps): void {
     
-    
     this.mainWindow = new BrowserWindow({
       title,
       width: 800,
       height: 600,
-      icon: props.icon,
+      icon: path.join(__dirname, "../../public/icon.png") || props.icon,
       webPreferences
     });
 

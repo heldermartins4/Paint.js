@@ -1,16 +1,29 @@
-import ICommand from "../../presenters/ICommand";
+import { Command } from "../../presenters/ICommand";
+import Draw from "../Draw";
 
-import Canvas from '../Canvas';
+class UndoCommand implements Command {
 
-class UndoCommand implements ICommand {
-    private canvas: Canvas;
+    private draw: Draw;
 
-    constructor(canvas: Canvas) {
-        this.canvas = canvas;
+    constructor(draw: Draw) {
+        this.draw = draw;
     }
 
     execute(): void {
-        // this.canvas.undo();
+
+        if (this.draw.undoStack.length > 0) {
+            const lines = this.draw.undoStack.pop();
+            if (lines) {
+                this.draw.redoStack.push(lines);
+                this.draw._lines = this.draw._lines.filter(l => l !== lines);
+                this.draw.clear();
+                this.draw._lines.forEach(lines => {
+                    lines.forEach(line => {
+                        this.draw.drawLine(line.x1, line.y1, line.x2, line.y2, line.color, line.thickness);
+                    });
+                });
+            }
+        }
     }
 }
 
