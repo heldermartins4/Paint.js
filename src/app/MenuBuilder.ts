@@ -76,17 +76,17 @@ class MenuItemsBuilder {
             this._window.webContents.send("changeColor", { color: "pink" });
           })
         ]),
-        this.createItem("Mode", [
-          this.createItem("Line", () => {
-            this._window.webContents.send("changeMode", { mode: "line" });
-          }),
-          this.createItem("Circle", () => {
-            this._window.webContents.send("changeMode", { mode: "circle" });
-          }),
-          this.createItem("Square", () => {
-            this._window.webContents.send("changeMode", { mode: "square" });
-          })
-        ]),
+        // this.createItem("Mode", [
+        //   this.createItem("Line", () => {
+        //     this._window.webContents.send("changeMode", { mode: "line" });
+        //   }),
+        //   this.createItem("Circle", () => {
+        //     this._window.webContents.send("changeMode", { mode: "circle" });
+        //   }),
+        //   this.createItem("Square", () => {
+        //     this._window.webContents.send("changeMode", { mode: "square" });
+        //   })
+        // ]),
         this.createItem("Size", [
           this.createItem("Change Line Thickness", [
             this.createItem("10", () => {

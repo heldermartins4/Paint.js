@@ -1,8 +1,8 @@
-import React, { Component, Fragment } from "react";
-import { Toolbar } from "./components/Toolbar";
+import React, { Component, createRef } from "react";
 import Draw from "./app/Draw";
 import styled from "styled-components";
 import { ContainerStyled } from "./components/Toolbar/styles";
+import { Toolbar } from "./components/Toolbar";
 
 interface AppState {
   color: string;
@@ -12,10 +12,12 @@ interface AppState {
 
 export class App extends Component<{}, AppState> {
   canvasRef: React.RefObject<HTMLCanvasElement>;
+  inputRef: React.RefObject<HTMLInputElement>;
 
   constructor(props: any) {
     super(props);
-    this.canvasRef = React.createRef();
+    this.canvasRef = createRef();
+    this.inputRef = createRef();
     this.state = {
       color: '#000000',
       thickness: 1,
@@ -26,7 +28,17 @@ export class App extends Component<{}, AppState> {
   componentDidMount() {
     const draw = new Draw(this.canvasRef.current as HTMLCanvasElement);
     this.setState({ draw });
+
+    // ipcRenderer.on("saveFile", this.saveDrawing);
+    // ipcRenderer.on("openFile", this.triggerFileInput);
+    // ipcRenderer.on("changeColor", (event, { color }) => this.handleColorChange(color));
   }
+
+  // componentWillUnmount() {
+  //   ipcRenderer.removeAllListeners("saveFile");
+  //   ipcRenderer.removeAllListeners("openFile");
+  // }
+
 
   componentDidUpdate(prevProps: {}, prevState: AppState) {
     if (this.state.draw) {
@@ -43,52 +55,66 @@ export class App extends Component<{}, AppState> {
     if (this.state.draw) {
       this.state.draw.startPainting(event.nativeEvent.offsetX, event.nativeEvent.offsetY);
     }
-  };
+  }
 
   onCanvasMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (this.state.draw) {
       this.state.draw.paint(event.nativeEvent.offsetX, event.nativeEvent.offsetY);
     }
-  };
+  }
 
   onCanvasMouseUp = () => {
     if (this.state.draw) {
       this.state.draw.stopPainting();
     }
-  };
+  }
 
   onCanvasMouseLeave = () => {
     if (this.state.draw) {
       this.state.draw.stopPainting();
     }
-  };
+  }
 
   onClear = () => {
     if (this.state.draw) {
       this.state.draw.clear();
     }
-  };
+  }
 
   handleColorChange = (color: string) => {
     this.setState({ color });
-  };
+  }
 
   handleThicknessChange = (thickness: number) => {
     this.setState({ thickness });
-  };
+  }
 
   saveDrawing = () => {
-    if (this.state.draw) {
-      const drawing = this.state.draw.lines;
-      const jsondata = JSON.stringify({ data: drawing });
-      const blob = new Blob([jsondata], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
+    try {
+      if (this.state.draw) {
+        const drawing = this.state.draw.lines;
+        const jsondata = JSON.stringify({ data: drawing });
+        const blob = new Blob([jsondata], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
 
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "drawing.pnt";
-      a.click();
-      URL.revokeObjectURL(url);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "drawing.pnt";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Error saving drawing:', error);
+    }
+  }
+
+  triggerFileInput = () => {
+    try {
+      if (this.inputRef.current) {
+        this.inputRef.current.click();
+      }
+    } catch (error) {
+      console.error('Error triggering file input:', error);
     }
   };
 
@@ -97,19 +123,25 @@ export class App extends Component<{}, AppState> {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const data = e.target?.result as string;
-        const drawing = JSON.parse(data).data;
-        if (this.state.draw) {
-          this.state.draw.clear();
-          this.state.draw.lines = drawing;
-          this.state.draw.lines.forEach((lines: any) => {
-            lines.forEach((line: any) => {
-              this.state.draw?.drawLine(line.x1, line.y1, line.x2, line.y2, line.color, line.thickness);
+        try {
+          const data = e.target?.result as string;
+          const drawing = JSON.parse(data).data;
+          if (this.state.draw) {
+            this.state.draw.clear();
+            this.state.draw.lines = drawing;
+            this.state.draw.lines.forEach((lines: any) => {
+              lines.forEach((line: any) => {
+                this.state.draw?.drawLine(line.x1, line.y1, line.x2, line.y2, line.color, line.thickness);
+              });
             });
-          });
+          }
+        } catch (error) {
+          console.error('Error loading drawing:', error);
         }
       };
       reader.readAsText(file);
+    } else {
+      console.error('No file selected');
     }
   };
 
@@ -132,7 +164,13 @@ export class App extends Component<{}, AppState> {
           />
         )}
         <button onClick={this.saveDrawing}>Salvar</button>
-        <input type="file" accept=".pnt" onChange={this.loadDrawing} />
+        <input
+          type="file"
+          accept=".pnt"
+          // value={'Insira um arquivo'}
+          ref={this.inputRef}
+          onChange={this.loadDrawing}
+        />
       </ContainerStyled>
     );
   }
@@ -145,3 +183,5 @@ const CanvasStyled = styled.canvas`
   outline: none;
   border: 2px solid #eee;
 `;
+
+export default App;
